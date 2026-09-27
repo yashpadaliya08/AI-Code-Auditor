@@ -9,7 +9,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "dev": "tsx watch src/presentation/cli/index.ts",
+    "dev": "tsx watch src/presentation/web/server.ts",
+    "serve": "tsx src/presentation/web/server.ts",
     "audit": "tsx src/presentation/cli/index.ts",
     "test": "vitest run",
     "test:watch": "vitest"

@@ -110,10 +110,10 @@ To ensure uninterrupted operation on Google AI Studio's Free Tier:
 - [x] Create HTML report generator (single-file standalone dashboard with search, filter by severity, and syntax-highlighted diffs).
 - [x] Write end-to-end tests against vulnerable test fixtures (DVWA, Juice Shop snippets).
 
-### Phase 4: Web UI & Launch (Day 4+)
-- [ ] Build clean, lightweight web frontend (Vite/Next.js).
-- [ ] Public waitlist / demo page allowing visitors to audit their open-source repos.
-- [ ] Add "Export to GitHub Issue / PR" capability.
+### Phase 4: Web UI & Launch (Completed)
+- [x] Build clean, lightweight web frontend (Vite/Next.js).
+- [x] Public waitlist / demo page allowing visitors to audit their open-source repos.
+- [x] Add "Export to GitHub Issue / PR" capability.
 
 ---
 

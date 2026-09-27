@@ -8,5 +8,7 @@ export * from './llm/GeminiFlashAdapter.js';
 export * from './storage/HtmlReportExporter.js';
 export * from './storage/JsonReportExporter.js';
 export * from './storage/MarkdownReportExporter.js';
+export * from './storage/GitHubIssueExporter.js';
+
 
 
