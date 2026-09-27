@@ -105,10 +105,10 @@ To ensure uninterrupted operation on Google AI Studio's Free Tier:
 - [x] Construct the Master Auditor System Prompt with Zod schema enforcement (`responseSchema`).
 - [x] Implement `GeminiRateLimiter` with automatic retry on 429 status.
 
-### Phase 3: CLI Runner & Report Exporters (Day 3)
-- [ ] Build terminal CLI with `commander` (`npx audit-repo --path ./my-app`).
-- [ ] Create HTML report generator (single-file standalone dashboard with search, filter by severity, and syntax-highlighted diffs).
-- [ ] Write end-to-end tests against vulnerable test fixtures (DVWA, Juice Shop snippets).
+### Phase 3: CLI Runner & Report Exporters (Completed)
+- [x] Build terminal CLI with `commander` (`npx audit-repo --path ./my-app`).
+- [x] Create HTML report generator (single-file standalone dashboard with search, filter by severity, and syntax-highlighted diffs).
+- [x] Write end-to-end tests against vulnerable test fixtures (DVWA, Juice Shop snippets).
 
 ### Phase 4: Web UI & Launch (Day 4+)
 - [ ] Build clean, lightweight web frontend (Vite/Next.js).

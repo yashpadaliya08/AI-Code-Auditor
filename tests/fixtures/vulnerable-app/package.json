@@ -1,0 +1,11 @@
+{
+  "name": "vulnerable-ecommerce-api",
+  "version": "1.0.0",
+  "description": "Intentionally vulnerable sample app for security audit testing",
+  "main": "src/index.ts",
+  "dependencies": {
+    "express": "^4.19.2",
+    "pg": "^8.11.5",
+    "jsonwebtoken": "^9.0.2"
+  }
+}
