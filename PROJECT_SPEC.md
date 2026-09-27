@@ -100,10 +100,10 @@ To ensure uninterrupted operation on Google AI Studio's Free Tier:
 - [x] Implement `LocalRepoReader` and `GitHubCloner` (shallow clone `git clone --depth 1`).
 - [x] Implement `FileFilter` (respects `.gitignore`, ignores vendor/minified assets).
 
-### Phase 2: Gemini Adapter & Schema-Enforced Prompts (Day 2)
-- [ ] Integrate `@google/genai` with `gemini-2.5-flash` or `gemini-1.5-flash`.
-- [ ] Construct the Master Auditor System Prompt with Zod schema enforcement (`responseSchema`).
-- [ ] Implement `GeminiRateLimiter` with automatic retry on 429 status.
+### Phase 2: Gemini Adapter & Schema-Enforced Prompts (Completed)
+- [x] Integrate `@google/genai` with `gemini-2.5-flash` or `gemini-1.5-flash`.
+- [x] Construct the Master Auditor System Prompt with Zod schema enforcement (`responseSchema`).
+- [x] Implement `GeminiRateLimiter` with automatic retry on 429 status.
 
 ### Phase 3: CLI Runner & Report Exporters (Day 3)
 - [ ] Build terminal CLI with `commander` (`npx audit-repo --path ./my-app`).
