@@ -91,7 +91,19 @@ export class GeminiRateLimiter {
 
         // Add randomized jitter (100ms - 500ms) to prevent thundering herd
         const jitter = Math.floor(Math.random() * 400) + 100;
-        const sleepTime = Math.min(currentBackoff + jitter, this.maxBackoffMs);
+        let sleepTime = Math.min(currentBackoff + jitter, this.maxBackoffMs);
+
+        // Parse Google's exact retry suggestion if present
+        const errStr = String(err);
+        const msMatch = errStr.match(/retry in ([0-9.]+)ms/i);
+        const secMatch = errStr.match(/retry in ([0-9.]+)s/i);
+        if (msMatch && msMatch[1]) {
+          const suggestedMs = Math.ceil(parseFloat(msMatch[1]));
+          sleepTime = Math.max(sleepTime, suggestedMs + 200);
+        } else if (secMatch && secMatch[1]) {
+          const suggestedMs = Math.ceil(parseFloat(secMatch[1]) * 1000);
+          sleepTime = Math.max(sleepTime, suggestedMs + 500);
+        }
 
         await this.delay(sleepTime);
         currentBackoff = Math.min(currentBackoff * 2, this.maxBackoffMs);

@@ -28,7 +28,7 @@ export class LocalRepoReader implements IRepoFetcher {
       throw new Error(`Target path is not a valid directory: ${absolutePath}`);
     }
 
-    const maxTokenBudget = options?.maxTokenBudget ?? 600_000;
+    const maxTokenBudget = options?.maxTokenBudget ?? 150_000;
     const filter = new FileFilter({
       extraIgnorePatterns: options?.extraIgnorePatterns,
       maxFileSizeBytes: options?.maxFileSizeBytes,

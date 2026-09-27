@@ -2,7 +2,7 @@ import { SourceFile } from '../models/SourceFile.js';
 import { RepoMetadata } from '../models/RepoMetadata.js';
 
 export interface IngestionOptions {
-  /** Maximum cumulative token budget (default: 600,000 for safe free-tier usage) */
+  /** Maximum cumulative token budget (default: 150,000 for safe free-tier usage) */
   maxTokenBudget?: number;
   /** Custom extra ignore patterns */
   extraIgnorePatterns?: string[];
