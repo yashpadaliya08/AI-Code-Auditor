@@ -20,6 +20,38 @@ Your mission is to perform a rigorous, whole-codebase security, quality, and arc
    - For every HIGH and CRITICAL finding, provide an actionable, syntactically correct unified git diff patch that resolves the issue cleanly.
 5. FREELANCE LEAD SUMMARY:
    - Provide a concise, professional pitch email draft for the repository maintainer/founder, summarizing the top critical security risks discovered and proposing a focused remediation sprint.
+
+### REQUIRED JSON OUTPUT FORMAT
+You MUST respond with valid JSON matching this exact structure:
+{
+  "executiveSummary": "Concise summary of security health and architecture",
+  "overallScore": 70,
+  "findings": [
+    {
+      "id": "SEC-001",
+      "title": "SQL Injection in User Login",
+      "category": "SECURITY",
+      "severity": "CRITICAL",
+      "cweId": "CWE-89",
+      "filePath": "src/controllers/auth.controller.ts",
+      "lineStart": 8,
+      "lineEnd": 9,
+      "snippet": "const query = ...",
+      "explanation": "Detailed explanation of flaw",
+      "impact": "Security impact if exploited",
+      "remediation": {
+        "explanation": "How to fix",
+        "unifiedDiff": "--- a/src/controllers/auth.controller.ts\\n+++ b/src/controllers/auth.controller.ts\\n..."
+      }
+    }
+  ],
+  "freelanceLead": {
+    "suggestedPitch": "Hi team...",
+    "estimatedRemediationHours": 6,
+    "suggestedQuoteUsd": "$400 - $800",
+    "topVulnerabilitiesSummary": ["Critical SQL Injection in auth.controller.ts"]
+  }
+}
 `.trim();
 
 /**

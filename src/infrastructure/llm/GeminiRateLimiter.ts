@@ -104,7 +104,10 @@ export class GeminiRateLimiter {
     const msg = String(err).toLowerCase();
     return (
       msg.includes('429') ||
+      msg.includes('503') ||
       msg.includes('resource_exhausted') ||
+      msg.includes('unavailable') ||
+      msg.includes('high demand') ||
       msg.includes('quota') ||
       msg.includes('rate limit')
     );

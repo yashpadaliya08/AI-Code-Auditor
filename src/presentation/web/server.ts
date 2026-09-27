@@ -87,7 +87,7 @@ export function createAuditServer(defaultPort: number = 3000) {
 
         const llmClient = new GeminiFlashAdapter({
           apiKey,
-          model: body.model || 'gemini-2.5-flash',
+          model: body.model || 'gemini-3.1-flash-lite',
           rateLimiter,
         });
 

@@ -29,7 +29,7 @@ program
   .option('-o, --output <filePath>', 'Destination path for generated audit report')
   .option('-f, --format <format>', 'Report format: html, json, or markdown', 'html')
   .option('-k, --key <apiKey>', 'Google Gemini API key (defaults to GEMINI_API_KEY env var)')
-  .option('-m, --model <modelName>', 'Gemini model to use', 'gemini-2.5-flash')
+  .option('-m, --model <modelName>', 'Gemini model to use', 'gemini-3.1-flash-lite')
   .option('--pitch', 'Display generated freelance/founder outreach pitch in terminal')
   .action(async (options) => {
     console.log(chalk.bold.hex('#3b82f6')(`\n🛡️  AI CODE AUDITOR — Autonomous Repository Engine`));

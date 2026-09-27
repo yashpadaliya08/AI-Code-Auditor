@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security & Quality Audit: vulnerable-app</title>
+  <style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111827;
+      --card-border: #1f293d;
+      --card-hover: #162035;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --primary: #3b82f6;
+      --critical: #ef4444;
+      --critical-bg: rgba(239, 68, 68, 0.15);
+      --high: #f97316;
+      --high-bg: rgba(249, 115, 22, 0.15);
+      --medium: #eab308;
+      --medium-bg: rgba(234, 179, 8, 0.15);
+      --low: #10b981;
+      --low-bg: rgba(16, 185, 129, 0.15);
+      --info: #6b7280;
+      --info-bg: rgba(107, 114, 128, 0.15);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.5;
+      padding: 2rem 1.5rem;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 2rem;
+      border-bottom: 1px solid var(--card-border);
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      color: white;
+      font-weight: 800;
+      font-size: 1.25rem;
+      padding: 0.5rem 0.75rem;
+      border-radius: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-text p {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .meta-badges {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 9999px;
+      font-weight: 600;
+      background: #1f2937;
+      color: #d1d5db;
+      border: 1px solid #374151;
+    }
+
+    /* Score Ring and Summary Grid */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    @media (max-width: 860px) {
+      .summary-grid { grid-template-columns: 1fr; }
+    }
+
+    .score-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .score-circle {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      border: 6px solid #ef4444;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    }
+
+    .score-number {
+      font-size: 2.75rem;
+      font-weight: 800;
+      line-height: 1;
+      color: #fff;
+    }
+
+    .score-label {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .risk-pill {
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      font-weight: 700;
+      padding: 0.3rem 0.9rem;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      background: rgba(239, 68, 68, 0.2);
+      color: #ef4444;
+    }
+
+    .details-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .exec-summary {
+      font-size: 0.95rem;
+      color: #e5e7eb;
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .counters-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .counter-box {
+      background: #0d121f;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .counter-value {
+      font-size: 1.5rem;
+      font-weight: 700;
+    }
+
+    .counter-name {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      letter-spacing: 0.5px;
+      margin-top: 0.2rem;
+    }
+
+    .color-critical { color: var(--critical); }
+    .color-high { color: var(--high); }
+    .color-medium { color: var(--medium); }
+    .color-low { color: var(--low); }
+    .color-info { color: var(--info); }
+
+    /* Filter & Search Bar */
+    .controls-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: #1f293d;
+      color: #fff;
+      border-color: #3b82f6;
+    }
+
+    .search-input {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 0.45rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      width: 260px;
+    }
+    .search-input:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+
+    /* Findings List */
+    .findings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .finding-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: border-color 0.2s;
+    }
+    .finding-card:hover {
+      border-color: #374151;
+    }
+
+    .finding-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1rem;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .finding-title-group {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      flex-wrap: wrap;
+    }
+
+    .severity-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    .badge-CRITICAL { background: var(--critical-bg); color: var(--critical); border: 1px solid var(--critical); }
+    .badge-HIGH { background: var(--high-bg); color: var(--high); border: 1px solid var(--high); }
+    .badge-MEDIUM { background: var(--medium-bg); color: var(--medium); border: 1px solid var(--medium); }
+    .badge-LOW { background: var(--low-bg); color: var(--low); border: 1px solid var(--low); }
+    .badge-INFO { background: var(--info-bg); color: var(--info); border: 1px solid var(--info); }
+
+    .cwe-tag {
+      font-size: 0.75rem;
+      color: #93c5fd;
+      background: rgba(59, 130, 246, 0.1);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      font-family: monospace;
+    }
+
+    .finding-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .location-info {
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #9ca3af;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .code-block {
+      background: #090d16;
+      border: 1px solid #1f2937;
+      border-radius: 6px;
+      padding: 0.85rem;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.85rem;
+      overflow-x: auto;
+      margin-bottom: 0.85rem;
+      color: #d1d5db;
+    }
+
+    .explanation-text {
+      font-size: 0.9rem;
+      color: #d1d5db;
+      margin-bottom: 0.6rem;
+    }
+
+    .impact-box {
+      font-size: 0.85rem;
+      color: #fca5a5;
+      background: rgba(239, 68, 68, 0.08);
+      border-left: 3px solid var(--critical);
+      padding: 0.5rem 0.75rem;
+      border-radius: 0 4px 4px 0;
+      margin-bottom: 0.85rem;
+    }
+
+    .diff-section {
+      background: #080d1a;
+      border: 1px solid #1e293b;
+      border-radius: 6px;
+      margin-top: 0.85rem;
+      overflow: hidden;
+    }
+
+    .diff-header {
+      background: #0f172a;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #94a3b8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .diff-code {
+      font-family: ui-monospace, monospace;
+      font-size: 0.8rem;
+      padding: 0.75rem;
+      white-space: pre-wrap;
+      overflow-x: auto;
+      line-height: 1.4;
+    }
+
+    .diff-add { color: #4ade80; background: rgba(74, 222, 128, 0.1); display: block; }
+    .diff-sub { color: #f87171; background: rgba(248, 113, 113, 0.1); display: block; }
+
+    .copy-btn {
+      background: #1e293b;
+      color: #cbd5e1;
+      border: 1px solid #334155;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: #334155; color: #fff; }
+
+    /* Pitch Card for Freelance / Bounty outreach */
+    .pitch-banner {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.12), rgba(139, 92, 246, 0.12));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .pitch-banner h3 {
+      font-size: 1.1rem;
+      color: #60a5fa;
+      margin-bottom: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .pitch-body {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+      white-space: pre-wrap;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 1rem;
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      margin-top: 0.75rem;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand">
+        <div class="logo-badge">🛡️ AI</div>
+        <div class="brand-text">
+          <h1>Security & Architecture Audit</h1>
+          <p>Repository: <strong>vulnerable-app</strong> (local)</p>
+        </div>
+      </div>
+      <div class="meta-badges">
+        <span class="badge">Branch: master</span>
+        <span class="badge">Commit: fa469248</span>
+        <span class="badge">Files Audited: 4</span>
+        <span class="badge">Tokens: ~445</span>
+        <span class="badge">Date: 27/9/2026</span>
+      </div>
+    </header>
+
+    
+    <div class="pitch-banner">
+      <h3>🚀 Founder / Bug Bounty Outreach Draft</h3>
+      <p style="font-size: 0.85rem; color: #94a3b8;">
+        Estimated Remediation: <strong>8 hours</strong> |
+        Suggested Freelance Range: <strong>$600 - $1200</strong>
+      </p>
+      <div class="pitch-body">Hi team, I performed a security audit of your repository and identified several critical vulnerabilities, including SQL injection and OS command injection, which could lead to full system compromise. I have prepared a remediation plan to secure your infrastructure and optimize database performance. I am available to execute these fixes immediately.</div>
+    </div>
+    
+
+    <div class="summary-grid">
+      <div class="score-card">
+        <div class="score-circle">
+          <div class="score-number">20</div>
+          <div class="score-label">Health Score</div>
+        </div>
+        <div class="risk-pill">CRITICAL RISK</div>
+      </div>
+
+      <div class="details-card">
+        <div>
+          <h3 style="font-size: 1.1rem; margin-bottom: 0.5rem; color: #fff;">Executive Summary</h3>
+          <p class="exec-summary">The codebase contains critical security vulnerabilities including SQL injection, OS command injection, and hardcoded credentials, alongside significant performance anti-patterns (N+1 queries). Immediate remediation is required to prevent unauthorized data access and remote code execution.</p>
+        </div>
+        <div class="counters-row">
+          <div class="counter-box">
+            <div class="counter-value color-critical">2</div>
+            <div class="counter-name">Critical</div>
+          </div>
+          <div class="counter-box">
+            <div class="counter-value color-high">1</div>
+            <div class="counter-name">High</div>
+          </div>
+          <div class="counter-box">
+            <div class="counter-value color-medium">1</div>
+            <div class="counter-name">Medium</div>
+          </div>
+          <div class="counter-box">
+            <div class="counter-value color-low">0</div>
+            <div class="counter-name">Low</div>
+          </div>
+          <div class="counter-box">
+            <div class="counter-value color-info">0</div>
+            <div class="counter-name">Info</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <div class="filter-tabs">
+        <button class="filter-btn active" onclick="filterFindings('ALL')">All (4)</button>
+        <button class="filter-btn" onclick="filterFindings('CRITICAL')">Critical (2)</button>
+        <button class="filter-btn" onclick="filterFindings('HIGH')">High (1)</button>
+        <button class="filter-btn" onclick="filterFindings('MEDIUM')">Medium (1)</button>
+        <button class="filter-btn" onclick="filterFindings('LOW')">Low (0)</button>
+      </div>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by title, file, or CWE..." oninput="handleSearch()">
+    </div>
+
+    <div id="findingsContainer" class="findings-list">
+      
+      <div class="finding-card" data-severity="CRITICAL" data-search="sql injection in user login src/controllers/auth.controller.ts cwe-89">
+        <div class="finding-header">
+          <div class="finding-title-group">
+            <span class="severity-badge badge-CRITICAL">CRITICAL</span>
+            <span class="cwe-tag">CWE-89</span>
+            <span class="badge">SECURITY</span>
+            <h2 class="finding-title">SQL Injection in User Login</h2>
+          </div>
+          <span style="font-family: monospace; font-size: 0.75rem; color: #6b7280;">#SEC-001</span>
+        </div>
+
+        <div class="location-info">
+          📁 src/controllers/auth.controller.ts : L8 - L9
+        </div>
+
+        <div class="code-block">const query = &quot;SELECT * FROM users WHERE email = &#039;&quot; + email + &quot;&#039; AND password = &#039;&quot; + password + &quot;&#039;&quot;;
+  const user = await db.query(query);</div>
+
+        <p class="explanation-text">The application constructs SQL queries using direct string concatenation of user-supplied input, allowing attackers to manipulate the query structure.</p>
+
+        <div class="impact-box">
+          <strong>Impact:</strong> Full database compromise, authentication bypass, and potential data exfiltration.
+        </div>
+
+        
+        <div class="diff-section">
+          <div class="diff-header">
+            <span>Proposed Remediation: Use parameterized queries (prepared statements) provided by the database driver to safely handle user input.</span>
+            <button class="copy-btn" onclick="copyDiff(0)">Copy Diff</button>
+          </div>
+          <div class="diff-code" id="diff-0">--- a/src/controllers/auth.controller.ts
++++ b/src/controllers/auth.controller.ts
+@@ -8,1 +8,1 @@
+<span class="diff-sub">-  const query = &quot;SELECT * FROM users WHERE email = &#039;&quot; + email + &quot;&#039; AND password = &#039;&quot; + password + &quot;&#039;&quot;;</span>
+<span class="diff-sub">-  const user = await db.query(query);</span>
+<span class="diff-add">+  const user = await db.query(&#039;SELECT * FROM users WHERE email = $1 AND password = $2&#039;, [email, password]);</span></div>
+        </div>
+        
+      </div>
+      
+      <div class="finding-card" data-severity="CRITICAL" data-search="os command injection in billing service src/services/billing.service.ts cwe-78">
+        <div class="finding-header">
+          <div class="finding-title-group">
+            <span class="severity-badge badge-CRITICAL">CRITICAL</span>
+            <span class="cwe-tag">CWE-78</span>
+            <span class="badge">SECURITY</span>
+            <h2 class="finding-title">OS Command Injection in Billing Service</h2>
+          </div>
+          <span style="font-family: monospace; font-size: 0.75rem; color: #6b7280;">#SEC-002</span>
+        </div>
+
+        <div class="location-info">
+          📁 src/services/billing.service.ts : L6 - L6
+        </div>
+
+        <div class="code-block">const cmd = `wkhtmltopdf https://billing.internal/invoices/${invoiceId} /tmp/${outputName}.pdf`;</div>
+
+        <p class="explanation-text">Untrusted input from &#039;invoiceId&#039; and &#039;outputName&#039; is interpolated directly into a shell command string executed by &#039;exec&#039;.</p>
+
+        <div class="impact-box">
+          <strong>Impact:</strong> Remote Code Execution (RCE) on the host server.
+        </div>
+
+        
+        <div class="diff-section">
+          <div class="diff-header">
+            <span>Proposed Remediation: Avoid using &#039;exec&#039; with shell interpolation. Use &#039;execFile&#039; or &#039;spawn&#039; with an array of arguments to prevent shell command injection.</span>
+            <button class="copy-btn" onclick="copyDiff(1)">Copy Diff</button>
+          </div>
+          <div class="diff-code" id="diff-1">--- a/src/services/billing.service.ts
++++ b/src/services/billing.service.ts
+@@ -1,1 +1,2 @@
+<span class="diff-sub">-import { exec } from &#039;node:child_process&#039;;</span>
+<span class="diff-add">+import { execFile } from &#039;node:child_process&#039;;</span>
+@@ -6,3 +7,3 @@
+<span class="diff-sub">-  const cmd = `wkhtmltopdf https://billing.internal/invoices/${invoiceId} /tmp/${outputName}.pdf`;</span>
+<span class="diff-sub">-  exec(cmd, (err, stdout, stderr) =&gt; {</span>
+<span class="diff-add">+  execFile(&#039;wkhtmltopdf&#039;, [`https://billing.internal/invoices/${invoiceId}`, `/tmp/${outputName}.pdf`], (err, stdout, stderr) =&gt; {</span></div>
+        </div>
+        
+      </div>
+      
+      <div class="finding-card" data-severity="HIGH" data-search="hardcoded jwt secret src/controllers/auth.controller.ts cwe-798">
+        <div class="finding-header">
+          <div class="finding-title-group">
+            <span class="severity-badge badge-HIGH">HIGH</span>
+            <span class="cwe-tag">CWE-798</span>
+            <span class="badge">SECURITY</span>
+            <h2 class="finding-title">Hardcoded JWT Secret</h2>
+          </div>
+          <span style="font-family: monospace; font-size: 0.75rem; color: #6b7280;">#SEC-003</span>
+        </div>
+
+        <div class="location-info">
+          📁 src/controllers/auth.controller.ts : L2 - L2
+        </div>
+
+        <div class="code-block">const JWT_SECRET = &#039;SUPER_SECRET_HARDCODED_KEY_12345&#039;;</div>
+
+        <p class="explanation-text">Sensitive cryptographic material is hardcoded in the source code, making it visible to anyone with repository access.</p>
+
+        <div class="impact-box">
+          <strong>Impact:</strong> Unauthorized token forging and session hijacking.
+        </div>
+
+        
+        <div class="diff-section">
+          <div class="diff-header">
+            <span>Proposed Remediation: Move the secret to an environment variable (e.g., process.env.JWT_SECRET).</span>
+            <button class="copy-btn" onclick="copyDiff(2)">Copy Diff</button>
+          </div>
+          <div class="diff-code" id="diff-2">--- a/src/controllers/auth.controller.ts
++++ b/src/controllers/auth.controller.ts
+@@ -2,1 +2,1 @@
+<span class="diff-sub">-const JWT_SECRET = &#039;SUPER_SECRET_HARDCODED_KEY_12345&#039;;</span>
+<span class="diff-add">+const JWT_SECRET = process.env.JWT_SECRET;</span></div>
+        </div>
+        
+      </div>
+      
+      <div class="finding-card" data-severity="MEDIUM" data-search="n+1 database query pattern src/services/report.service.ts cwe-664">
+        <div class="finding-header">
+          <div class="finding-title-group">
+            <span class="severity-badge badge-MEDIUM">MEDIUM</span>
+            <span class="cwe-tag">CWE-664</span>
+            <span class="badge">PERFORMANCE</span>
+            <h2 class="finding-title">N+1 Database Query Pattern</h2>
+          </div>
+          <span style="font-family: monospace; font-size: 0.75rem; color: #6b7280;">#PERF-001</span>
+        </div>
+
+        <div class="location-info">
+          📁 src/services/report.service.ts : L6 - L11
+        </div>
+
+        <div class="code-block">const reports = await Promise.all(
+    users.map(async (u: any) =&gt; {
+      const orders = await db.query(`SELECT * FROM orders WHERE user_id = ${u.id}`);
+      return { ...u, orders };
+    })
+  );</div>
+
+        <p class="explanation-text">The code executes one database query for the initial list of users, followed by one additional query per user to fetch orders, causing significant latency as the user base grows.</p>
+
+        <div class="impact-box">
+          <strong>Impact:</strong> Degraded application performance and excessive database load.
+        </div>
+
+        
+        <div class="diff-section">
+          <div class="diff-header">
+            <span>Proposed Remediation: Use a single JOIN query or a single query with an &#039;IN&#039; clause to fetch all required data in one round-trip.</span>
+            <button class="copy-btn" onclick="copyDiff(3)">Copy Diff</button>
+          </div>
+          <div class="diff-code" id="diff-3">--- a/src/services/report.service.ts
++++ b/src/services/report.service.ts
+@@ -3,9 +3,2 @@
+<span class="diff-sub">-  const users = await db.query(&#039;SELECT id, name FROM users&#039;);</span>
+<span class="diff-sub">-</span>
+<span class="diff-sub">-  const reports = await Promise.all(</span>
+<span class="diff-sub">-    users.map(async (u: any) =&gt; {</span>
+<span class="diff-sub">-      const orders = await db.query(`SELECT * FROM orders WHERE user_id = ${u.id}`);</span>
+<span class="diff-sub">-      return { ...u, orders };</span>
+<span class="diff-sub">-    })</span>
+<span class="diff-sub">-  );</span>
+<span class="diff-add">+  const reports = await db.query(&#039;SELECT u.id, u.name, o.* FROM users u LEFT JOIN orders o ON u.id = o.user_id&#039;);</span></div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </div>
+
+  <script>
+    const findingsData = [{"id":"SEC-001","title":"SQL Injection in User Login","category":"SECURITY","severity":"CRITICAL","cweId":"CWE-89","filePath":"src/controllers/auth.controller.ts","lineStart":8,"lineEnd":9,"snippet":"const query = \"SELECT * FROM users WHERE email = '\" + email + \"' AND password = '\" + password + \"'\";\n  const user = await db.query(query);","explanation":"The application constructs SQL queries using direct string concatenation of user-supplied input, allowing attackers to manipulate the query structure.","impact":"Full database compromise, authentication bypass, and potential data exfiltration.","remediation":{"explanation":"Use parameterized queries (prepared statements) provided by the database driver to safely handle user input.","unifiedDiff":"--- a/src/controllers/auth.controller.ts\n+++ b/src/controllers/auth.controller.ts\n@@ -8,1 +8,1 @@\n-  const query = \"SELECT * FROM users WHERE email = '\" + email + \"' AND password = '\" + password + \"'\";\n-  const user = await db.query(query);\n+  const user = await db.query('SELECT * FROM users WHERE email = $1 AND password = $2', [email, password]);"}},{"id":"SEC-002","title":"OS Command Injection in Billing Service","category":"SECURITY","severity":"CRITICAL","cweId":"CWE-78","filePath":"src/services/billing.service.ts","lineStart":6,"lineEnd":6,"snippet":"const cmd = `wkhtmltopdf https://billing.internal/invoices/${invoiceId} /tmp/${outputName}.pdf`;","explanation":"Untrusted input from 'invoiceId' and 'outputName' is interpolated directly into a shell command string executed by 'exec'.","impact":"Remote Code Execution (RCE) on the host server.","remediation":{"explanation":"Avoid using 'exec' with shell interpolation. Use 'execFile' or 'spawn' with an array of arguments to prevent shell command injection.","unifiedDiff":"--- a/src/services/billing.service.ts\n+++ b/src/services/billing.service.ts\n@@ -1,1 +1,2 @@\n-import { exec } from 'node:child_process';\n+import { execFile } from 'node:child_process';\n@@ -6,3 +7,3 @@\n-  const cmd = `wkhtmltopdf https://billing.internal/invoices/${invoiceId} /tmp/${outputName}.pdf`;\n-  exec(cmd, (err, stdout, stderr) => {\n+  execFile('wkhtmltopdf', [`https://billing.internal/invoices/${invoiceId}`, `/tmp/${outputName}.pdf`], (err, stdout, stderr) => {"}},{"id":"SEC-003","title":"Hardcoded JWT Secret","category":"SECURITY","severity":"HIGH","cweId":"CWE-798","filePath":"src/controllers/auth.controller.ts","lineStart":2,"lineEnd":2,"snippet":"const JWT_SECRET = 'SUPER_SECRET_HARDCODED_KEY_12345';","explanation":"Sensitive cryptographic material is hardcoded in the source code, making it visible to anyone with repository access.","impact":"Unauthorized token forging and session hijacking.","remediation":{"explanation":"Move the secret to an environment variable (e.g., process.env.JWT_SECRET).","unifiedDiff":"--- a/src/controllers/auth.controller.ts\n+++ b/src/controllers/auth.controller.ts\n@@ -2,1 +2,1 @@\n-const JWT_SECRET = 'SUPER_SECRET_HARDCODED_KEY_12345';\n+const JWT_SECRET = process.env.JWT_SECRET;"}},{"id":"PERF-001","title":"N+1 Database Query Pattern","category":"PERFORMANCE","severity":"MEDIUM","cweId":"CWE-664","filePath":"src/services/report.service.ts","lineStart":6,"lineEnd":11,"snippet":"const reports = await Promise.all(\n    users.map(async (u: any) => {\n      const orders = await db.query(`SELECT * FROM orders WHERE user_id = ${u.id}`);\n      return { ...u, orders };\n    })\n  );","explanation":"The code executes one database query for the initial list of users, followed by one additional query per user to fetch orders, causing significant latency as the user base grows.","impact":"Degraded application performance and excessive database load.","remediation":{"explanation":"Use a single JOIN query or a single query with an 'IN' clause to fetch all required data in one round-trip.","unifiedDiff":"--- a/src/services/report.service.ts\n+++ b/src/services/report.service.ts\n@@ -3,9 +3,2 @@\n-  const users = await db.query('SELECT id, name FROM users');\n-\n-  const reports = await Promise.all(\n-    users.map(async (u: any) => {\n-      const orders = await db.query(`SELECT * FROM orders WHERE user_id = ${u.id}`);\n-      return { ...u, orders };\n-    })\n-  );\n+  const reports = await db.query('SELECT u.id, u.name, o.* FROM users u LEFT JOIN orders o ON u.id = o.user_id');"}}];
+
+    function filterFindings(sev) {
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.finding-card');
+      cards.forEach(card => {
+        if (sev === 'ALL' || card.getAttribute('data-severity') === sev) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function handleSearch() {
+      const q = document.getElementById('searchInput').value.toLowerCase().trim();
+      const cards = document.querySelectorAll('.finding-card');
+      cards.forEach(card => {
+        const text = card.getAttribute('data-search') || '';
+        if (!q || text.includes(q)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function copyDiff(idx) {
+      const finding = findingsData[idx];
+      if (finding && finding.remediation && finding.remediation.unifiedDiff) {
+        navigator.clipboard.writeText(finding.remediation.unifiedDiff).then(() => {
+          alert('Unified git diff copied to clipboard!');
+        });
+      }
+    }
+  </script>
+</body>
+</html>

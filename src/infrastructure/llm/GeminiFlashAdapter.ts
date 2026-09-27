@@ -17,7 +17,7 @@ export interface GeminiFlashAdapterOptions {
 export class GeminiFlashAdapter implements ILlmClient {
   private ai: GoogleGenAI;
   private primaryModel: string;
-  private fallbackModel: string;
+  private fallbackModels: string[];
   private rateLimiter: GeminiRateLimiter;
 
   constructor(options?: GeminiFlashAdapterOptions) {
@@ -29,8 +29,10 @@ export class GeminiFlashAdapter implements ILlmClient {
     }
 
     this.ai = new GoogleGenAI({ apiKey: key });
-    this.primaryModel = options?.model ?? 'gemini-2.5-flash';
-    this.fallbackModel = options?.fallbackModel ?? 'gemini-1.5-flash';
+    this.primaryModel = options?.model ?? 'gemini-3.1-flash-lite';
+    this.fallbackModels = options?.fallbackModel
+      ? [options.fallbackModel, 'gemini-3-flash-preview', 'gemini-3.1-flash-lite-preview', 'gemini-flash-latest']
+      : ['gemini-3-flash-preview', 'gemini-3.1-flash-lite-preview', 'gemini-flash-latest'];
     this.rateLimiter = options?.rateLimiter ?? new GeminiRateLimiter();
   }
 
@@ -41,18 +43,24 @@ export class GeminiFlashAdapter implements ILlmClient {
     prompt: string,
     options?: LlmAnalysisOptions
   ): Promise<T> {
-    const modelToUse = options?.model ?? this.primaryModel;
+    const candidates = options?.model
+      ? [options.model, ...this.fallbackModels]
+      : [this.primaryModel, ...this.fallbackModels];
 
     return this.rateLimiter.schedule(async () => {
-      try {
-        return await this.callGemini<T>(modelToUse, prompt, options);
-      } catch (err: unknown) {
-        // If primary model fails with a model not found / unsupported error, attempt fallback
-        if (modelToUse === this.primaryModel && this.shouldTryFallback(err)) {
-          return await this.callGemini<T>(this.fallbackModel, prompt, options);
+      let lastError: unknown;
+      for (const model of candidates) {
+        try {
+          return await this.callGemini<T>(model, prompt, options);
+        } catch (err: unknown) {
+          lastError = err;
+          if (this.shouldTryFallback(err)) {
+            continue;
+          }
+          throw err;
         }
-        throw err;
       }
+      throw lastError;
     });
   }
 
@@ -156,7 +164,10 @@ export class GeminiFlashAdapter implements ILlmClient {
     return (
       msg.includes('not found') ||
       msg.includes('unsupported') ||
-      msg.includes('model')
+      msg.includes('model') ||
+      msg.includes('503') ||
+      msg.includes('unavailable') ||
+      msg.includes('high demand')
     );
   }
 }
