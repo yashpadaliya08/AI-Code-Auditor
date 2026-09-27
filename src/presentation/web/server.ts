@@ -13,11 +13,29 @@ import {
   GitHubIssueExporter,
 } from '../../infrastructure/index.js';
 
+import * as fsSync from 'node:fs';
+
 dotenv.config();
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const PUBLIC_DIR = path.join(__dirname, 'public');
+
+// Robust resolution for both source (tsx) and compiled (dist) modes
+function resolvePublicDir(): string {
+  const candidates = [
+    path.join(__dirname, 'public'),
+    path.join(process.cwd(), 'src', 'presentation', 'web', 'public'),
+    path.join(process.cwd(), 'public'),
+  ];
+  for (const c of candidates) {
+    if (fsSync.existsSync(c)) {
+      return c;
+    }
+  }
+  return path.join(__dirname, 'public');
+}
+
+const PUBLIC_DIR = resolvePublicDir();
 
 export function createAuditServer(defaultPort: number = 3000) {
   const rateLimiter = new GeminiRateLimiter({ requestsPerMinute: 14 });
