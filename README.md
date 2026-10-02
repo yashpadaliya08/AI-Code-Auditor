@@ -99,6 +99,32 @@ Open **`http://localhost:3000`** in your browser.
 
 ---
 
+## 📊 Sample Audit Report & Artifacts
+
+You can inspect a pre-generated executive HTML audit report in the repository:
+- **Sample Report**: [`docs/examples/sample-report.html`](docs/examples/sample-report.html) (generated from scanning `tests/fixtures/vulnerable-app`).
+- To view it locally, open `docs/examples/sample-report.html` in any web browser.
+
+> [!NOTE]
+> All newly generated runtime reports (`audit-report-*.*`, `reports/`) are intentionally ignored by `.gitignore` to prevent client vulnerability data or temporary runs from polluting git history.
+
+---
+
+## 🛡️ Repository Hygiene & Commit Guidelines
+
+To keep the repository clean, lightweight, and secure:
+
+| Include in Version Control (Commit) | Excluded from Version Control (`.gitignore`) |
+| :--- | :--- |
+| **Core Source Code** (`src/`) | **Secrets & Keys** (`.env`, `.env.local`, `*.key`, `*.pem`) |
+| **Unit & Integration Tests** (`tests/`) | **Build Artifacts** (`dist/`, `build/`, `*.tsbuildinfo`) |
+| **Synthetic Fixtures** (`tests/fixtures/`) | **Dependencies** (`node_modules/`) |
+| **Package Manifests** (`package.json`, `package-lock.json`) | **Runtime Reports** (`audit-report-*`, `reports/`) |
+| **Configuration Templates** (`.env.example`, `tsconfig.json`) | **Cache & Temp Dirs** (`.audit-cache/`, `tmp/`, `temp/`) |
+| **Architecture Specs & Docs** (`AGENTS.md`, `PROJECT_SPEC.md`, `README.md`) | **Coverage & Logs** (`coverage/`, `*.log`) |
+
+---
+
 ## 🧪 Testing & Validation
 
 Run the complete test suite (35 unit and integration tests):

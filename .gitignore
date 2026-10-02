@@ -25,8 +25,16 @@ tmp/
 temp/
 .audit-cache/
 
+# Audit Outputs & Generated Reports
+audit-report-*
+reports/
+*.report.json
+*.report.html
+*.report.md
+
 # OS / IDE
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
+
